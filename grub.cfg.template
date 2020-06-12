@@ -1,0 +1,263 @@
+loadfont unicode
+insmod all_video
+set gfxmode=1024x768
+set gfxpayload=keep
+set gfxterm_font=unicode
+terminal_output gfxterm
+
+search --no-floppy --fs-uuid --set=root  "$BOOT_UUID"
+
+
+X64_FOUND=""
+
+cpuid -l
+
+if [ "$?" -eq 0 ]
+then
+  X64_FOUND="1"
+fi
+
+
+NATURALS="0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15"
+
+
+function set_max_node {
+  NEXT_NODE="$#"
+}
+
+function fetch_indirect {
+  shift "$1"
+  NEXT_NODE="$1"
+}
+
+function make_dir_name {
+  DIR_NAME=""
+  while [ $# -gt 0 ]
+  do
+    DIR_NAME="$1/$DIR_NAME"
+    shift
+  done
+  DIR_NAME="$BOOT_ROOT"/"$DIR_NAME"
+}
+
+function truncate {
+  NEXT_NODE="$1"
+  shift
+  TRACK="$*"
+}
+
+function enter_next_level {
+  TRACK="$NEXT_NODE $TRACK"
+  set_max_node $NATURALS
+  IS_TERMINAL="1"
+}
+
+function exit_current_level {
+  truncate $TRACK
+  IS_TERMINAL=""
+}
+
+function reverse {
+  RTRACK=""
+  while [ $# -gt 0 ]
+  do
+    RTRACK="$1 $RTRACK"
+    shift
+  done
+}
+
+
+function next_dir {
+
+  DIR_NAME="$DIR_NAME/$1"
+
+  TITLE="$1"
+
+  if [ -f "$DIR_NAME/title" ]
+  then
+    source "$DIR_NAME/title"
+    tr --set=TITLE ' ' '_' "$TITLE"
+  fi
+
+  if [ -z "$TITLE_FULL" ]
+  then
+    TC_VER="$TITLE"
+  fi
+
+  TITLE_FULL="$TITLE_FULL-$TITLE"
+
+  shift
+  RTRACK="$*"
+}
+
+
+function check_existing {
+
+  if [ -f "$DIR_NAME/vmlinuz" ]
+  then
+    PATH_TO_VMLINUZ="$DIR_NAME/vmlinuz"
+  fi
+
+  if [ -f "$DIR_NAME/vmlinuz64" ]
+  then
+    PATH_TO_VMLINUZ64="$DIR_NAME/vmlinuz64"
+  fi
+
+  if [ -f "$DIR_NAME/modules.gz" ]
+  then
+    PATH_TO_MODULES="$DIR_NAME/modules.gz"
+  fi
+
+  if [ -f "$DIR_NAME/modules64.gz" ]
+  then
+    PATH_TO_MODULES64="$DIR_NAME/modules64.gz"
+  fi
+
+  if [ -f "$DIR_NAME/rootfs.gz" ]
+  then
+    PATH_TO_ROOTFS="$DIR_NAME/rootfs.gz"
+  fi
+
+  if [ -f "$DIR_NAME/rootfs64.gz" ]
+  then
+    PATH_TO_ROOTFS64="$DIR_NAME/rootfs64.gz"
+  fi
+}
+
+
+function collect {
+
+  reverse $*
+
+  DIR_NAME="$BOOT_ROOT"
+  TC_VER="~"
+  TITLE_FULL=""
+  BOOTCODES_FULL="$BOOTCODES_DEF"
+
+  PATH_TO_VMLINUZ=""
+  PATH_TO_VMLINUZ64=""
+  PATH_TO_MODULES=""
+  PATH_TO_MODULES64=""
+  PATH_TO_ROOTFS=""
+  PATH_TO_ROOTFS64=""
+
+  while true
+  do
+
+    if [ -f "$DIR_NAME/bootcodes" ]
+    then
+      BOOTCODES=""
+      source "$DIR_NAME/bootcodes"
+      BOOTCODES_FULL="$BOOTCODES_FULL $BOOTCODES"
+    fi
+  
+    check_existing
+
+    if [ -z "$RTRACK" ]
+    then
+      break;
+    fi
+
+    next_dir $RTRACK
+
+  done
+}
+
+function create_entry {
+
+  T_FULL="$1"
+  P_VM="$2"
+  P_RF="$3"
+  P_MD="$4"
+
+  TCE_U="$5"
+
+  TC_V="$6"
+  if [ "$TC_V" == "~" ]
+  then
+    TC_V=""
+  fi
+
+  TCE_SUF="$7"
+  if [ "$TCE_SUF" == "~" ]
+  then
+    TCE_SUF=""
+  fi
+
+  shift 7
+
+
+menuentry  $T_FULL $P_VM $P_RF $P_MD "tce=UUID=${TCE_U}/tce${TC_V}${TCE_SUF}"  $*  {
+M_PTV="$2"
+M_PTR="$3"
+M_PTM="$4"
+shift 4
+linux $M_PTV $*
+initrd $M_PTR $M_PTM
+}
+
+}
+
+function create_entries {
+
+  if [ -n "$PATH_TO_ROOTFS" ]
+  then
+    if [ -n "$X64_FOUND" -a -n "$PATH_TO_VMLINUZ64" -a -n "$PATH_TO_MODULES64" ]
+    then
+
+      create_entry "core64${TITLE_FULL}" "${PATH_TO_VMLINUZ64}" "${PATH_TO_ROOTFS}" "${PATH_TO_MODULES64}" "${TCE_UUID}" "${TC_VER}" "~" "${BOOTCODES_FULL}"
+
+    else
+      if [ -n "$PATH_TO_VMLINUZ" -a -n "$PATH_TO_MODULES" ]
+      then
+
+      create_entry "core${TITLE_FULL}" "${PATH_TO_VMLINUZ}" "${PATH_TO_ROOTFS}" "${PATH_TO_MODULES}" "${TCE_UUID}" "${TC_VER}" "~" "${BOOTCODES_FULL}"
+
+      fi
+    fi 
+  fi
+
+  if [ -n "$X64_FOUND" -a -n "$PATH_TO_ROOTFS64" -a -n "$PATH_TO_VMLINUZ64" -a -n "$PATH_TO_MODULES64" ]
+  then
+
+      create_entry "corepure64${TITLE_FULL}" "${PATH_TO_VMLINUZ64}" "${PATH_TO_ROOTFS64}" "${PATH_TO_MODULES64}" "${TCE_UUID}" "${TC_VER}" "-64" "${BOOTCODES_FULL}"
+
+  fi
+}
+
+
+
+while true
+do
+
+  make_dir_name $NEXT_NODE $TRACK
+
+  if [ -d "$DIR_NAME" ]
+  then
+    enter_next_level
+  else
+    while [ "$NEXT_NODE" == "0" ]
+    do
+
+      if [ -n "$IS_TERMINAL" ]
+      then
+
+        collect $TRACK
+        create_entries
+
+      fi
+
+      if [ -z "$TRACK" ]
+      then
+        break 2;
+      fi
+
+      exit_current_level
+
+    done
+
+    fetch_indirect $NEXT_NODE $NATURALS
+  fi
+
+done
+
