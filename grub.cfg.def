@@ -1,6 +1,6 @@
-BOOT_UUID="4bb588c2-382b-4754-a8b8-63a1f946fe07"
+BOOT_UUID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 BOOT_ROOT="/."
-TCE_UUID="6e071bfc-01e0-4918-853f-c04686c36683"
+TCE_UUID="yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
 
 BOOTCODES_DEF="waitusb=10:UUID=${TCE_UUID}"
 
