@@ -44,7 +44,34 @@ directives for more descriptive boot entry naming.
 Files of different types are gathered along the path in the different manner. Core files are replacing ones found earlier, bootcodes are accumulated.
 
 ## Limitations
-Caused by the grub2 shell limitations. Only dirctories named as natural numbers, defined in the NATURALS string in grub.cfg.template, will be visible for the executable. But as usual, limitation can turn to advantage, if You need to hide any subtree without deleting it, You can simply rename the subtree top.
+Caused by the grub2 shell limitations. Only dirctories named as natural numbers, defined in the NATURALS string in grub.cfg.template, will be visible for the executable. But as usual, limitation can turn to advantage, if You need to hide any subtree without deleting it, You can simply rename the subtree root node.
 
-## Proposed BOOT tree layout and content
+## TCE directories
+Highest BOOT_ROOT subdir names are expected to be the major TinyCore version numbers and produce corresponding "tce=.../tceX" or "tce=.../tceX-64" bootcode, where X is highest subdir name. Respectively, "tce=.../tceX" for "rootfs.gz" accessible and "tce=.../tceX-64 for "rootfs64.gz" accessible.
+
+## Boot entries
+Depending on accessibility of core files and CPU bitness up to two entries can be created for each terminal node - see
+
+        function create_entries
+        
+in the source code.
+
+Boot entry name consists of the prefix and whole path steps, spaced with '-' symbols. Prefixes are:
+
+- "Core" - for {vmlinuz; rootfs.gz; modules.gz}  
+- "Core64" - for {vmlinuz64; rootfs.gz; modules64.gz}
+- "Corepure64" - for {vmlinuz64; rootfs64.gz; modules64.gz}
+  
+### Example 1
+
+Node /11/1/3/9 is terminal. Content of /bootcodes is 'BOOTCODES="quiet"'. /11/1 contains vmlinuz, vmlinuz64, modules.gz and modules64.gz. /11/1/3 contains rootfs.gz. Content of /11/1/3/9/bootcodes is 'BOOTCODES="base"'
+
+Then for 32-bit CPU will be created entry, named "Core-11-1-3-9" loading /11/1/vmlinuz as kernel, /11/1/3/rootfs.gz + /11/1/modules.gz as initrd and passing "tce=UUID=${TCE_UUID}/tce11 quiet base" as the bootcodes.
+
+For 64-bit CPU will be created entry, named "Core64-11-1-3-9" loading /11/1/vmlinuz64 as kernel, /11/1/3/rootfs.gz + /11/1/modules64.gz as initrd and passing "tce=UUID=${TCE_UUID}/tce11 quiet base" as the bootcodes.
+
+In case will be present /11/1/3/9/title with 'TITLE="base"' definition, for 32-bit and 64-bit CPUs entry names becomes
+"Core-11-1-3-base" and "Core64-11-1-3-base" correspondingly.
+
+
 
