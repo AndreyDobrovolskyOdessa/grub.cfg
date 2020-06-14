@@ -80,4 +80,6 @@ Let's imagine, that You've packed custom /11/1/3/8/rootfs.gz  and placed it in t
 - 64-bit "Core64-11-1-3-myrootfs", applying /11/1/vmlinuz64 as kernel, /11/1/3/8/rootfs.gz + /11/1/modules64.gz as initrd and
 "tce=UUID=.../tce11 quiet noswap" as the bootcodes.
 
+Pay attention, that /11/1/3/8/rootfs.gz replaced /11/1/3/rootfs.gz from the previous example.
+
 
