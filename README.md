@@ -64,17 +64,17 @@ Boot entry name consists of the prefix and whole path steps, spaced with '-' sym
   
 ### Example 1
 
-Node /11/1/3/9 is terminal. Content of /bootcodes is 'BOOTCODES="quiet"'. /11/1 contains vmlinuz, vmlinuz64, modules.gz and modules64.gz. /11/1/3 contains rootfs.gz. Content of /11/1/3/9/bootcodes is 'BOOTCODES="base"'
+Node /11/1/3/9 is terminal. Content of /bootcodes is 'BOOTCODES="quiet" '. /11/1 contains vmlinuz, vmlinuz64, modules.gz and modules64.gz. /11/1/3 contains rootfs.gz. Content of /11/1/3/9/bootcodes is 'BOOTCODES="base" '
 
 Then for 32-bit CPU will be created entry, named "Core-11-1-3-9" loading /11/1/vmlinuz as kernel, /11/1/3/rootfs.gz + /11/1/modules.gz as initrd and passing "tce=UUID=${TCE_UUID}/tce11 quiet base" as the bootcodes.
 
 For 64-bit CPU will be created entry, named "Core64-11-1-3-9" loading /11/1/vmlinuz64 as kernel, /11/1/3/rootfs.gz + /11/1/modules64.gz as initrd and passing "tce=UUID=${TCE_UUID}/tce11 quiet base" as the bootcodes.
 
-In case will be present /11/1/3/9/title with 'TITLE="base"' definition, for 32-bit and 64-bit CPUs entry names becomes
+In case will be present /11/1/3/9/title with 'TITLE="base" ' definition, for 32-bit and 64-bit CPUs entry names becomes
 "Core-11-1-3-base" and "Core64-11-1-3-base" correspondingly.
 
 ### Example 2
-Let's imagine, that You've packed custom /11/1/3/8/rootfs.gz  and placed it in the directory along with the /11/1/3/8/title containing 'TITLE="myrootfs"' and /11/1/3/8/bootcodes, containing 'BOOTCODES=noswap'. Then along with the entry, described in the Example 1 new entry will be created:
+Let's imagine, that You've packed custom /11/1/3/8/rootfs.gz  and placed it in the directory along with the /11/1/3/8/title containing 'TITLE="myrootfs" ' and /11/1/3/8/bootcodes, containing 'BOOTCODES="noswap" '. Then along with the entry, described in the Example 1 new entry will be created:
 - 32-bit "Core-11-1-3-myrootfs", applying /11/1/vmlinuz as kernel, /11/1/3/8/rootfs.gz + /11/1/modules.gz as initrd and
 "tce=UUID=.../tce11 quiet noswap" as the bootcodes, or
 - 64-bit "Core64-11-1-3-myrootfs", applying /11/1/vmlinuz64 as kernel, /11/1/3/8/rootfs.gz + /11/1/modules64.gz as initrd and
