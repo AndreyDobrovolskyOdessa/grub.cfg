@@ -14,6 +14,9 @@ and extended to reach requested functionality with the appropriate subset of
 
 Performing this task by the boot manager (grub2 in our case) can be considered as walking through the branches of some directory tree from the root to one of the terminal nodes, gathering the members of the resulting set along the path. Additional level under root must be added for different TinyCore versions coexisting inside the same boot partition.
 
+## Purpose
+is to develop grub2 shell script, which will not need to be modified each time any changes made in the boot configuration, instead, it must create the boot menu according to the changed boot device content.
+
 ## Subject
 the subject is the "grub.cfg" file obtained as
 
@@ -82,4 +85,9 @@ Let's imagine, that You've packed custom /11/1/3/8/rootfs.gz  and placed it in t
 
 Pay attention, that /11/1/3/8/rootfs.gz replaced /11/1/3/rootfs.gz from the previous example.
 
+## grub4tc.sh
+Shell script making BIOS/UEFI bootable removable device. Try
 
+    ./grub4tc.sh --help
+    
+for usage and short description.
