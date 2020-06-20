@@ -179,24 +179,18 @@ function create_entry
   P_RF="$3"
   P_MD="$4"
 
-  TCE_U="$5"
-
-  TC_V="$6"
-  if [ "$TC_V" == "~" ]
+  if [ "$TC_VER" == "~" ]
   then
-    TC_V=""
+    TC_VER=""
   fi
 
-  TCE_SUF="$7"
+  TCE_SUF="$5"
   if [ "$TCE_SUF" == "~" ]
   then
     TCE_SUF=""
   fi
 
-  shift 7
-
-
-menuentry  $T_FULL $P_VM $P_RF $P_MD "tce=UUID=${TCE_U}/tce${TC_V}${TCE_SUF}"  $*  {
+menuentry  $T_FULL $P_VM $P_RF $P_MD "tce=UUID=${TCE_UUID}/tce${TC_VER}${TCE_SUF}" "${BOOTCODES_FULL}" {
 M_PTV="$2"
 M_PTR="$3"
 M_PTM="$4"
@@ -214,13 +208,13 @@ function create_entries
     if [ -n "$X64_FOUND" -a -n "$PATH_TO_VMLINUZ64" -a -n "$PATH_TO_MODULES64" ]
     then
 
-      create_entry "core64${TITLE_FULL}" "${PATH_TO_VMLINUZ64}" "${PATH_TO_ROOTFS}" "${PATH_TO_MODULES64}" "${TCE_UUID}" "${TC_VER}" "~" "${BOOTCODES_FULL}"
+      create_entry "core64${TITLE_FULL}" "${PATH_TO_VMLINUZ64}" "${PATH_TO_ROOTFS}" "${PATH_TO_MODULES64}" "~"
 
     else
       if [ -n "$PATH_TO_VMLINUZ" -a -n "$PATH_TO_MODULES" ]
       then
 
-      create_entry "core${TITLE_FULL}" "${PATH_TO_VMLINUZ}" "${PATH_TO_ROOTFS}" "${PATH_TO_MODULES}" "${TCE_UUID}" "${TC_VER}" "~" "${BOOTCODES_FULL}"
+      create_entry "core${TITLE_FULL}" "${PATH_TO_VMLINUZ}" "${PATH_TO_ROOTFS}" "${PATH_TO_MODULES}" "~"
 
       fi
     fi 
@@ -229,7 +223,7 @@ function create_entries
   if [ -n "$X64_FOUND" -a -n "$PATH_TO_ROOTFS64" -a -n "$PATH_TO_VMLINUZ64" -a -n "$PATH_TO_MODULES64" ]
   then
 
-      create_entry "corepure64${TITLE_FULL}" "${PATH_TO_VMLINUZ64}" "${PATH_TO_ROOTFS64}" "${PATH_TO_MODULES64}" "${TCE_UUID}" "${TC_VER}" "-64" "${BOOTCODES_FULL}"
+      create_entry "corepure64${TITLE_FULL}" "${PATH_TO_VMLINUZ64}" "${PATH_TO_ROOTFS64}" "${PATH_TO_MODULES64}" "-64"
 
   fi
 }
