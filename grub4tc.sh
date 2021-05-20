@@ -17,7 +17,7 @@ TinyCore Linux versions, bitnesses, flavors and user presets.
 
 Usage:
 
-    grub4tc.sh [ <drive name> | wait ] [ <boot partition size in MB> ]
+    grub4tc.sh [ <drive name> | wait [ <boot partition size in MB> ] ]
 
     If <drive name> ommitted or set to "wait", detects first removable drive,
 connected after the script was started. /dev/sda, drive being used by TinyCore
